@@ -51,7 +51,7 @@ addImageButton.addEventListener('click', () => {
             reader.onload = (event) => {
                 const rename = renameInput.value || file.name.split('.')[0];
                 const extension = getFileExtension(file.name);
-                images.push({ 
+                images.push({
                     name: rename,
                     originalName: file.name,
                     src: event.target.result,
@@ -65,12 +65,20 @@ addImageButton.addEventListener('click', () => {
             reader.readAsDataURL(file);
         });
 
-        imageInput.value = '';
+        //imageInput.value = '';
         renameInput.value = '';
     } else {
         alert("Por favor, selecione uma imagem e defina dimensões válidas.");
     }
 });
+
+function verificarTamanhoNome (nome) {
+    debugger
+    const maxLength = 20;
+        return nome.length > maxLength 
+            ? nome.substring(0, maxLength) + "..." 
+            : nome;
+        }
 
 function updateImageList() {
     imageList.innerHTML = '';
@@ -83,10 +91,12 @@ function updateImageList() {
         imgPreview.alt = image.name;
         imgPreview.className = 'w-16 h-16 object-cover rounded';
 
+        const nome = verificarTamanhoNome(image.name)        
+
         const infoDiv = document.createElement('div');
         infoDiv.className = 'flex-grow';
         infoDiv.innerHTML = `
-            <p class="font-semibold">${image.name}</p>
+            <p style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;width: 150px;" class="font-semibold">${nome}</p>
             <p class="text-sm text-gray-600">${image.width}px x ${image.height}px</p>
         `;
 
@@ -196,4 +206,56 @@ heightInput.addEventListener('input', () => {
 compressionQuality.addEventListener('input', () => {
     compressionQualityValue.textContent = `${Math.round(compressionQuality.value * 100)}%`;
 });
+
+
+
+
+const selectedFiles = document.getElementById('selectedFiles');
+const imageLabel = document.getElementById('imageLabel');
+const clearButton = document.getElementById('clearButton');
+
+imageInput.addEventListener('change', () => {
+    const files = imageInput.files;
+    if (files.length > 0) {
+        // Exibir o nome da primeira imagem selecionada
+
+        const nomeArquivo = verificarTamanhoNome(files[0].name)
+        selectedFiles.textContent = nomeArquivo
+        
+        // Mudar a cor do botão para cinza e desabilitar a interação
+        imageLabel.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+        imageLabel.classList.add('bg-gray-400', 'cursor-not-allowed');
+        
+        // Mostrar o botão "Limpar"
+        clearButton.classList.remove('hidden');
+        
+        // Desabilitar o input para evitar novas seleções
+        imageInput.disabled = true;
+    } else {
+        // Se nenhum arquivo for selecionado, resetar o texto e estilo
+        resetInput();
+    }
+});
+
+// Adiciona o evento de clique para o botão "Limpar"
+clearButton.addEventListener('click', () => {
+    resetInput();
+});
+
+// Função para redefinir o input e o feedback visual
+function resetInput() {
+    // Limpar o conteúdo do input
+    imageInput.value = '';
+    
+    // Resetar o texto e estilo do botão
+    selectedFiles.textContent = '';
+    imageLabel.classList.remove('bg-gray-400', 'cursor-not-allowed');
+    imageLabel.classList.add('bg-indigo-500', 'hover:bg-indigo-600');
+
+    // Ocultar o botão "Limpar"
+    clearButton.classList.add('hidden');
+
+    // Habilitar o input novamente
+    imageInput.disabled = false;
+}
 

@@ -5,21 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redimensionar Imagens</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link rel="stylesheet" href="./src/style.css">
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
     <div class="container mx-auto bg-white rounded-lg shadow-xl p-8 max-w-4xl">
-        <h1 class="text-3xl font-bold text-center mb-8 text-indigo-600">Redimensionar Imagens</h1>
+        <h1 class="text-3xl font-bold text-center mb-8 text-indigo-600 uppercase">Redimensionar várias imagens</h1>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-4">
                 <div class="flex items-center space-x-4">
-                    <label for="imageInput" class="cursor-pointer bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition">
+                    <label id="imageLabel" for="imageInput" class="cursor-pointer bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition">
                         Escolher Imagem
                     </label>
                     <input type="file" id="imageInput" class="hidden" accept="image/*" multiple>
                     <span id="selectedFiles" class="text-sm text-gray-600"></span>
-                </div>
+                    <button id="clearButton" class="rounded-full transition hidden">
+                        <i style="font-size: 20px;color: red;" class="fa-regular fa-circle-xmark"></i>
+                    </div>
+                
+                
 
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700">Tamanho Predefinido</label>
