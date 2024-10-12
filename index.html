@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redimensionar Imagens</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        input[type="file"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        a {
+            display: none;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #canvas {
+            display: none; /* Oculta o canvas */
+        }
+
+        .image-list {
+            margin-top: 20px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .image-item {
+            margin: 10px 0;
+        }
+        #resizeButton{
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: -2px 1px 3px 0px black;
+        }
+        #addImageButton{
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: -2px 1px 3px 0px black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Redimensionar Imagens</h1>
+        <input type="file" id="imageInput" accept="image/*">
+        <input type="number" id="width" placeholder="Largura (px)">
+        <input type="number" id="height" placeholder="Altura (px)">
+        <button id="addImageButton">Adicionar Imagem</button>
+        <button id="resizeButton">Redimensionar Imagens</button>
+        <a id="downloadLink">Baixar Imagens</a>
+        <div class="image-list" id="imageList"></div>
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const addImageButton = document.getElementById('addImageButton');
+        const resizeButton = document.getElementById('resizeButton');
+        const downloadLink = document.getElementById('downloadLink');
+        const imageList = document.getElementById('imageList');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let images = []; // Array para armazenar imagens e suas dimensões
+
+        addImageButton.addEventListener('click', () => {
+            const file = imageInput.files[0]; // Obtém a imagem selecionada
+            const width = parseInt(widthInput.value);
+            const height = parseInt(heightInput.value);
+
+            if (file && width > 0 && height > 0) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    images.push({ name: file.name, src: event.target.result, width, height });
+                    updateImageList();
+                    // Limpa os campos após adicionar a imagem
+                    imageInput.value = '';
+                    widthInput.value = '';
+                    heightInput.value = '';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert("Por favor, selecione uma imagem e defina dimensões válidas.");
+            }
+        });
+
+        function updateImageList() {
+            imageList.innerHTML = ''; // Limpa a lista atual
+            images.forEach((image, index) => {
+                const div = document.createElement('div');
+                div.className = 'image-item';
+                div.innerText = `${image.name} - ${image.width}px x ${image.height}px`;
+                imageList.appendChild(div);
+            });
+        }
+
+        resizeButton.addEventListener('click', () => {
+            const zip = new JSZip(); // Usando JSZip para criar um zip
+            let processedImages = 0; // Contador para imagens processadas
+
+            images.forEach(image => {
+                const img = new Image();
+                img.onload = () => {
+                    canvas.width = image.width;
+                    canvas.height = image.height;
+                    ctx.drawImage(img, 0, 0, image.width, image.height);
+                    canvas.toBlob(blob => {
+                        zip.file(image.name, blob);
+                        processedImages++; // Incrementa o contador
+                        // Verifica se todas as imagens foram processadas
+                        if (processedImages === images.length) {
+                            zip.generateAsync({ type: "blob" }).then(content => {
+                                const url = URL.createObjectURL(content);
+                                downloadLink.href = url;
+                                downloadLink.download = 'imagens.zip';
+                                downloadLink.style.display = 'block';
+                                downloadLink.innerText = 'Baixar Imagens';
+                            });
+                        }
+                    });
+                };
+                img.src = image.src;
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</body>
+</html>
