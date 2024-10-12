@@ -73,7 +73,7 @@ addImageButton.addEventListener('click', () => {
 });
 
 function verificarTamanhoNome (nome) {
-    debugger
+    
     const maxLength = 20;
         return nome.length > maxLength 
             ? nome.substring(0, maxLength) + "..." 
