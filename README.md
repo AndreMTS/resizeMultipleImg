@@ -2,6 +2,8 @@
 
 Este projeto é uma aplicação web simples que permite aos usuários selecionar imagens, definir suas dimensões e redimensioná-las. Os usuários podem adicionar várias imagens, renomeá-las e baixar todas as imagens redimensionadas em um arquivo ZIP.
 
+![Imagem do Redimensionador de Imagens](https://i.ibb.co/Z6WjVPS/demo-Redize.png)
+
 ## Funcionalidades
 
 - Seleção de imagens do sistema local.
@@ -13,8 +15,8 @@ Este projeto é uma aplicação web simples que permite aos usuários selecionar
 
 ## Demonstração
 
- - [Link para uma demonstração Github Pages]()
- - [Link para uma demonstração Surge]()
+ - [Link para uma demonstração Github Pages](https://andremts.github.io/resizeMultipleImg/)
+ - [Link para uma demonstração Surge](https://resize-multiple-img.surge.sh/)
 
 ## Licença
 
