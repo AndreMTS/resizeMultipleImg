@@ -24,7 +24,8 @@ function getMimeType(extension) {
         'jpg': 'image/jpeg',
         'jpeg': 'image/jpeg',
         'png': 'image/png',
-        'webp': 'image/webp'
+        'webp': 'image/webp',
+        'ico': 'image/x-icon'
     };
     return mimeTypes[extension.toLowerCase()] || 'image/jpeg';
 }

@@ -11,7 +11,15 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
     <div class="container mx-auto bg-white rounded-lg shadow-xl p-8 max-w-4xl">
-        <h1 class="text-3xl font-bold text-center mb-8 text-gray-600 uppercase">Redimensionar várias imagens <i class="ml-3 text-gray-600 fa-regular fa-images"></i></h1>
+        <div class="flex flex-row justify-center items-center text-center mb-8">
+            <div class="flex flex-col">
+                <span class="text-3xl font-bold mb-2 text-gray-600 uppercase">Redimensionar/converter</span>
+                <span class="text-2xl font-bold mb-2 text-gray-600 uppercase">várias imagens</span>
+            </div>
+            <div>
+                <i style="font-size: 100px;" class="ml-3 text-gray-600 fa-regular fa-images"></i>
+            </div>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-4">
@@ -70,6 +78,7 @@
                         <option value="jpg">JPG</option>
                         <option value="png">PNG</option>
                         <option value="webp">WebP</option>
+                        <option value="ico">ICO</option>
                     </select>
                 </div>
 
