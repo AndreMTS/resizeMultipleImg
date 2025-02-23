@@ -141,6 +141,7 @@ function resizeImages() {
                         downloadLink.href = url;
                         downloadLink.download = 'imagens_redimensionadas.zip';
                         downloadLink.classList.remove('hidden');
+                        downloadLink.style = "display: block; "
                         downloadLink.innerText = 'Baixar Imagens';
                     });
                 }
