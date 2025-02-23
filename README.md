@@ -2,7 +2,7 @@
 
 Este projeto é uma aplicação web simples que permite aos usuários selecionar imagens, definir suas dimensões e redimensioná-las. Os usuários podem adicionar várias imagens, renomeá-las e baixar todas as imagens redimensionadas em um arquivo ZIP.
 
-![Imagem do Redimensionador de Imagens](https://i.ibb.co/Z6WjVPS/demo-Redize.png)
+![Imagem do Redimensionador de Imagens](https://i.ibb.co/gMb4h1Fb/resize33.jpg)
 
 ## Funcionalidades
 
