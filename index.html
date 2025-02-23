@@ -1,112 +1,175 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redimensionar Imagens</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link rel="stylesheet" href="./src/style.css">
+    <script>
+        // Configuração do Tailwind para tema escuro
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            100: '#1a1a1a',
+                            200: '#2d2d2d',
+                            300: '#404040',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="container mx-auto bg-white rounded-lg shadow-xl p-8 max-w-4xl">
-        <div class="flex flex-row justify-center items-center text-center mb-8">
-            <div class="flex flex-col">
-                <span class="text-3xl font-bold mb-2 text-gray-600 uppercase">Redimensionar/converter</span>
-                <span class="text-2xl font-bold mb-2 text-gray-600 uppercase">várias imagens</span>
-            </div>
-            <div>
-                <i style="font-size: 100px;" class="ml-3 text-gray-600 fa-regular fa-images"></i>
-            </div>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="space-y-4">
-                <div class="flex items-center space-x-4">
-                    <label id="imageLabel" for="imageInput" class="cursor-pointer bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition">
-                        Escolher Imagem
-                    </label>
-                    <input type="file" id="imageInput" class="hidden" accept="image/*" multiple>
-                    <span id="selectedFiles" class="text-sm text-gray-600"></span>
-                    <button id="clearButton" class="rounded-full transition hidden">
-                        <i style="font-size: 20px;color: red;" class="fa-regular fa-circle-xmark"></i>
-                    </div>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 min-h-screen py-12 px-4 transition-colors duration-200">
+    <div class="max-w-6xl mx-auto">
+        <!-- Botão de Alternância de Tema -->
+        <button id="themeToggle" class="fixed top-4 right-4 p-2 rounded-lg bg-white dark:bg-dark-200 shadow-lg">
+            <i class="fas fa-sun text-yellow-500 dark:hidden"></i>
+            <i class="fas fa-moon text-blue-300 hidden dark:block"></i>
+        </button>
+
+        <!-- Header Section -->
+        <div class="bg-white dark:bg-dark-200 rounded-2xl shadow-lg p-8 mb-8 transition-colors duration-200">
+            <div class="flex items-center justify-center space-x-6">
+                <div class="text-center">
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        Redimensionar & Converter
+                    </h1>
+                    <p class="text-gray-600 dark:text-gray-300 mt-2 text-lg transition-colors duration-200">
+                        Transforme múltiplas imagens facilmente
+                    </p>
+                </div>
                 
-                
-
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Tamanho Predefinido</label>
-                    <select id="sizeSelect" class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="">Personalizado</option>
-                        <option value="16x16">16x16</option>
-                        <option value="32x32">32x32</option>
-                        <option value="128x128">128x128</option>
-                        <option value="152x152">152x152</option>
-                        <option value="192x192">192x192</option>
-                        <option value="256x256">256x256</option>
-                        <option value="384x384">384x384</option>
-                        <option value="512x512">512x512</option>
-                    </select>
-                </div>
-
-                <div class="flex space-x-4">
-                    <div class="flex-1">
-                        <label for="width" class="block text-sm font-medium text-gray-700">Largura</label>
-                        <input type="number" id="width" class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div class="flex-1">
-                        <label for="height" class="block text-sm font-medium text-gray-700">Altura</label>
-                        <input type="number" id="height" class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                </div>
-
-                <div class="flex items-center space-x-2">
-                    <input type="checkbox" id="maintainAspectRatio" class="rounded text-indigo-600 focus:ring-indigo-500">
-                    <label for="maintainAspectRatio" class="text-sm font-medium text-gray-700">Manter proporção</label>
-                </div>
-
-                <div>
-                    <label for="renameInput" class="block text-sm font-medium text-gray-700">Renomear (opcional)</label>
-                    <input type="text" id="renameInput" class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-
-                <div>
-                    <label for="fileFormat" class="block text-sm font-medium text-gray-700">Formato do arquivo</label>
-                    <select id="fileFormat" class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="original">Manter original</option>
-                        <option value="jpg">JPG</option>
-                        <option value="png">PNG</option>
-                        <option value="webp">WebP</option>
-                        <option value="ico">ICO</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="compressionQuality" class="block text-sm font-medium text-gray-700">Qualidade da compressão</label>
-                    <input type="range" id="compressionQuality" min="0" max="1" step="0.1" value="0.8" class="w-full">
-                    <span id="compressionQualityValue" class="text-sm text-gray-600">80%</span>
-                </div>
-
-                <button id="addImageButton" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Adicionar Imagem</button>
-                <button id="resizeButton" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Redimensionar Imagens</button>
-                <a id="downloadLink" class="hidden w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition text-center block">Baixar Imagens</a>
-            </div>
-
-            <div>
-                <h2 class="text-xl font-semibold mb-4 link uppercase text-center">Imagens Selecionadas</h2>
-                <div id="imageList" class="space-y-4 max-h-96 overflow-y-auto pr-4"></div>
             </div>
         </div>
-        <div class="text-center mt-5">
-            <p>Desenvolvido por
-                <a href="https://github.com/AndreMTS"><span class="link">[AndreMTS]</span></a> |
-                Projeto
-                <a href="https://github.com/AndreMTS/resizeMultipleImg"><span class="link">GitHub</span></a> 
-                <i class="fa-brands fa-github"></i>
-            </p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Controls Section -->
+            <div class="bg-white dark:bg-dark-200 rounded-2xl shadow-lg p-8 transition-colors duration-200">
+                <!-- File Upload -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-center w-full">
+                        <label id="dropZone" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-400 dark:border-blue-500 rounded-lg cursor-pointer bg-blue-50 dark:bg-dark-300 hover:bg-blue-100 dark:hover:bg-dark-100 transition duration-300">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-2"></i>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Adicionar imagem</p>
+                            </div>
+                            <input type="file" id="imageInput" class="hidden" accept="image/*" multiple>
+                        </label>
+                    </div>
+                    <div id="selectedFiles" class="mt-2 text-sm text-gray-600 dark:text-gray-300"></div>
+                    
+                    <button id="clearButton" class="hidden w-full mt-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition duration-300 shadow-md hover:text-white-600 dark:text-white-400 dark:hover:text-white-300">
+                        <i class="fas fa-times-circle"></i> Limpar seleção
+                    </button>
+                </div>
+
+                <!-- Size Controls -->
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tamanho Predefinido</label>
+                        <select id="sizeSelect" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-dark-300 dark:text-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Personalizado</option>
+                            <option value="16x16">16x16</option>
+                            <option value="32x32">32x32</option>
+                            <option value="128x128">128x128</option>
+                            <option value="152x152">152x152</option>
+                            <option value="192x192">192x192</option>
+                            <option value="256x256">256x256</option>
+                            <option value="384x384">384x384</option>
+                            <option value="512x512">512x512</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Largura</label>
+                            <input type="number" id="width" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-dark-300 dark:text-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Altura</label>
+                            <input type="number" id="height" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-dark-300 dark:text-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="maintainAspectRatio" class="rounded text-blue-600 focus:ring-blue-500 dark:bg-dark-300">
+                        <label class="text-sm text-gray-700 dark:text-gray-200">Manter proporção</label>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="useStandardNames" class="rounded text-blue-600 focus:ring-blue-500 dark:bg-dark-300">
+                        <label class="text-sm text-gray-700 dark:text-gray-200">Usar nomes padrão</label>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Renomear (opcional)</label>
+                        <input type="text" id="renameInput" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-dark-300 dark:text-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Formato do arquivo</label>
+                        <select id="fileFormat" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-dark-300 dark:text-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="original">Manter original</option>
+                            <option value="jpg">JPG</option>
+                            <option value="png">PNG</option>
+                            <option value="webp">WebP</option>
+                            <option value="ico">ICO</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Qualidade da compressão</label>
+                        <input type="range" id="compressionQuality" min="0" max="1" step="0.1" value="0.8" class="w-full h-2 bg-gray-200 dark:bg-dark-300 rounded-lg appearance-none cursor-pointer">
+                        <span id="compressionQualityValue" class="text-sm text-gray-600 dark:text-gray-300">80%</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button id="generateAllSizesButton" class="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition duration-300 shadow-md">
+                            <i class="fas fa-magic mr-2"></i> Gerar Todos os Tamanhos
+                        </button>
+                        <button id="addImageButton" class="w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition duration-300 shadow-md">
+                            <i class="fas fa-plus mr-2"></i> Adicionar Imagem
+                        </button>
+                        <button id="resizeButton" class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-300 shadow-md">
+                            <i class="fas fa-compress-arrows-alt mr-2"></i> Redimensionar Imagens
+                        </button>
+                        <a id="downloadLink" class="hidden w-full py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition duration-300 shadow-md text-center">
+                            <i class="fas fa-download mr-2"></i> Baixar Imagens
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="bg-white dark:bg-dark-200 rounded-2xl shadow-lg p-8 transition-colors duration-200">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 text-center">
+                    <i class="fas fa-images mr-2"></i> Imagens Selecionadas
+                </h2>
+                <div id="imageList" class="space-y-4 max-h-[600px] overflow-y-auto pr-4 rounded-lg"></div>
+            </div>
         </div>
+<!-- Footer -->
+<div class="flex justify-center items-center mt-8 text-gray-600 dark:text-gray-300 text-center gap-4">
+    <div>
+        Desenvolvido por
+        <a href="https://github.com/AndreMTS" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition">[AndreMTS]</a> |
+        <a href="https://github.com/AndreMTS/resizeMultipleImg" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition">
+            <i class="fab fa-github"></i> GitHub
+        </a>
     </div>
+    <div>
+        <img src="https://i.ibb.co/vCmNHvKh/eupix.png" alt="Logo" class="w-12 h-12 object-contain">
+    </div>
+</div>
+
+    </div>
+
     <canvas id="canvas" class="hidden"></canvas>
     <script src="script.js"></script>
 </body>

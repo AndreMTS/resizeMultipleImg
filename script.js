@@ -1,3 +1,4 @@
+// Seleção de elementos
 const imageInput = document.getElementById('imageInput');
 const widthInput = document.getElementById('width');
 const heightInput = document.getElementById('height');
@@ -11,10 +12,26 @@ const maintainAspectRatioCheckbox = document.getElementById('maintainAspectRatio
 const compressionQuality = document.getElementById('compressionQuality');
 const compressionQualityValue = document.getElementById('compressionQualityValue');
 const fileFormatSelect = document.getElementById('fileFormat');
+const useStandardNames = document.getElementById('useStandardNames');
+const generateAllSizesButton = document.getElementById('generateAllSizesButton');
+const selectedFiles = document.getElementById('selectedFiles');
+const clearButton = document.getElementById('clearButton');
 
 let images = [];
 let originalAspectRatio;
 
+const standardSizes = [
+    { width: 16, height: 16, name: 'favicon-16x16.png' },
+    { width: 32, height: 32, name: 'favicon-32x32.png' },
+    { width: 128, height: 128, name: 'icon-128x128.png' },
+    { width: 152, height: 152, name: 'apple-icon-152x152.png' },
+    { width: 192, height: 192, name: 'icon-192x192.png' },
+    { width: 256, height: 256, name: 'icon-256x256.png' },
+    { width: 384, height: 384, name: 'icon-384x384.png' },
+    { width: 512, height: 512, name: 'icon-512x512.png' }
+];
+
+// Funções utilitárias
 function getFileExtension(filename) {
     return filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
 }
@@ -30,6 +47,11 @@ function getMimeType(extension) {
     return mimeTypes[extension.toLowerCase()] || 'image/jpeg';
 }
 
+function verificarTamanhoNome(nome) {
+    const maxLength = 20;
+    return nome.length > maxLength ? nome.substring(0, maxLength) + "..." : nome;
+}
+
 function updateDimensionsFromSelect() {
     const size = sizeSelect.value;
     if (size) {
@@ -39,48 +61,12 @@ function updateDimensionsFromSelect() {
     }
 }
 
-sizeSelect.addEventListener('change', updateDimensionsFromSelect);
+function getStandardName(width, height) {
+    const standardSize = standardSizes.find(size => size.width === width && size.height === height);
+    return standardSize ? standardSize.name : `icon-${width}x${height}.png`;
+}
 
-addImageButton.addEventListener('click', () => {
-    const files = imageInput.files;
-    const width = parseInt(widthInput.value) || 0;
-    const height = parseInt(heightInput.value) || 0;
-
-    if (files.length > 0 && width > 0 && height > 0) {
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const rename = renameInput.value || file.name.split('.')[0];
-                const extension = getFileExtension(file.name);
-                images.push({
-                    name: rename,
-                    originalName: file.name,
-                    src: event.target.result,
-                    width,
-                    height,
-                    extension
-                });
-                updateImageList();
-                resizeImages();
-            };
-            reader.readAsDataURL(file);
-        });
-
-        //imageInput.value = '';
-        renameInput.value = '';
-    } else {
-        alert("Por favor, selecione uma imagem e defina dimensões válidas.");
-    }
-});
-
-function verificarTamanhoNome (nome) {
-    
-    const maxLength = 20;
-        return nome.length > maxLength 
-            ? nome.substring(0, maxLength) + "..." 
-            : nome;
-        }
-
+// Atualizar lista de imagens
 function updateImageList() {
     imageList.innerHTML = '';
     images.forEach((image, index) => {
@@ -92,12 +78,12 @@ function updateImageList() {
         imgPreview.alt = image.name;
         imgPreview.className = 'w-16 h-16 object-cover rounded';
 
-        const nome = verificarTamanhoNome(image.name)        
+        const nome = verificarTamanhoNome(image.name);
 
         const infoDiv = document.createElement('div');
         infoDiv.className = 'flex-grow';
         infoDiv.innerHTML = `
-            <p style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;width: 150px;" class="font-semibold">${nome}</p>
+            <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 150px;" class="font-semibold">${nome}</p>
             <p class="text-sm text-gray-600">${image.width}px x ${image.height}px</p>
         `;
 
@@ -113,12 +99,14 @@ function updateImageList() {
     });
 }
 
+// Remover imagem
 function removeImage(index) {
     images.splice(index, 1);
     updateImageList();
 }
 
-resizeButton.addEventListener('click', () => {
+// Redimensionar imagens
+function resizeImages() {
     if (images.length === 0) {
         alert("Por favor, adicione imagens antes de redimensionar.");
         return;
@@ -127,36 +115,32 @@ resizeButton.addEventListener('click', () => {
     const zip = new JSZip();
     let processedImages = 0;
 
-    images.forEach((image, index) => {
+    images.forEach((image) => {
         const img = new Image();
         img.onload = () => {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
-            // Redimensiona a imagem com base nas dimensões especificadas
             canvas.width = image.width;
             canvas.height = image.height;
             ctx.drawImage(img, 0, 0, image.width, image.height);
 
-            // Define o formato de saída (pode ser original ou alterado pelo usuário)
             const format = fileFormatSelect.value;
             const fileExtension = format === 'original' ? image.extension : format;
             const mimeType = getMimeType(fileExtension);
 
-            // Converte o canvas em um blob e adiciona ao arquivo ZIP
             canvas.toBlob(blob => {
-                const fileName = `${image.name}_${index}.${fileExtension}`; // Nome com índice para evitar sobrescrita
+                const fileName = `${image.name}.${fileExtension}`;
                 zip.file(fileName, blob);
 
                 processedImages++;
 
-                // Verifica se todas as imagens foram processadas
                 if (processedImages === images.length) {
                     zip.generateAsync({ type: "blob" }).then(content => {
                         const url = URL.createObjectURL(content);
                         downloadLink.href = url;
                         downloadLink.download = 'imagens_redimensionadas.zip';
-                        downloadLink.style.display = 'block';
+                        downloadLink.classList.remove('hidden');
                         downloadLink.innerText = 'Baixar Imagens';
                     });
                 }
@@ -167,14 +151,53 @@ resizeButton.addEventListener('click', () => {
             alert(`Erro ao carregar a imagem: ${image.name}`);
         };
 
-        // Define a origem da imagem para iniciar o carregamento
         img.src = image.src;
     });
+}
+
+// Event Listeners
+sizeSelect.addEventListener('change', updateDimensionsFromSelect);
+
+addImageButton.addEventListener('click', () => {
+    const files = imageInput.files;
+    const width = parseInt(widthInput.value) || 0;
+    const height = parseInt(heightInput.value) || 0;
+
+    if (files.length > 0 && width > 0 && height > 0) {
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                let fileName;
+                if (renameInput.value) {
+                    fileName = `${renameInput.value}_${width}x${height}`;
+                } else if (useStandardNames.checked) {
+                    fileName = getStandardName(width, height);
+                } else {
+                    fileName = `${file.name.split('.')[0]}_${width}x${height}`;
+                }
+
+                images.push({
+                    name: fileName.split('.')[0],
+                    originalName: file.name,
+                    src: event.target.result,
+                    width,
+                    height,
+                    extension: fileFormatSelect.value === 'original' ? getFileExtension(file.name) : fileFormatSelect.value
+                });
+                updateImageList();
+            };
+            reader.readAsDataURL(file);
+        });
+    } else {
+        alert("Por favor, selecione uma imagem e defina dimensões válidas.");
+    }
 });
+
+resizeButton.addEventListener('click', resizeImages);
 
 downloadLink.addEventListener('click', () => {
     setTimeout(() => {
-        downloadLink.style.display = 'none';
+        downloadLink.classList.add('hidden');
     }, 2000);
 });
 
@@ -189,6 +212,11 @@ imageInput.addEventListener('change', (e) => {
             }
         };
         img.src = URL.createObjectURL(e.target.files[0]);
+
+        const nomeArquivo = verificarTamanhoNome(e.target.files[0].name);
+        selectedFiles.textContent = nomeArquivo;
+        clearButton.classList.remove('hidden');
+        imageInput.disabled = true;
     }
 });
 
@@ -208,55 +236,66 @@ compressionQuality.addEventListener('input', () => {
     compressionQualityValue.textContent = `${Math.round(compressionQuality.value * 100)}%`;
 });
 
-
-
-
-const selectedFiles = document.getElementById('selectedFiles');
-const imageLabel = document.getElementById('imageLabel');
-const clearButton = document.getElementById('clearButton');
-
-imageInput.addEventListener('change', () => {
-    const files = imageInput.files;
-    if (files.length > 0) {
-        // Exibir o nome da primeira imagem selecionada
-
-        const nomeArquivo = verificarTamanhoNome(files[0].name)
-        selectedFiles.textContent = nomeArquivo
-        
-        // Mudar a cor do botão para cinza e desabilitar a interação
-        imageLabel.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
-        imageLabel.classList.add('bg-gray-400', 'cursor-not-allowed');
-        
-        // Mostrar o botão "Limpar"
-        clearButton.classList.remove('hidden');
-        
-        // Desabilitar o input para evitar novas seleções
-        imageInput.disabled = true;
-    } else {
-        // Se nenhum arquivo for selecionado, resetar o texto e estilo
-        resetInput();
-    }
-});
-
-// Adiciona o evento de clique para o botão "Limpar"
 clearButton.addEventListener('click', () => {
-    resetInput();
+    imageInput.value = '';
+    selectedFiles.textContent = '';
+    clearButton.classList.add('hidden');
+    imageInput.disabled = false;
+    images = [];
+    updateImageList();
 });
 
-// Função para redefinir o input e o feedback visual
-function resetInput() {
-    // Limpar o conteúdo do input
-    imageInput.value = '';
-    
-    // Resetar o texto e estilo do botão
-    selectedFiles.textContent = '';
-    imageLabel.classList.remove('bg-gray-400', 'cursor-not-allowed');
-    imageLabel.classList.add('bg-indigo-500', 'hover:bg-indigo-600');
+generateAllSizesButton.addEventListener('click', () => {
+    const files = imageInput.files;
 
-    // Ocultar o botão "Limpar"
-    clearButton.classList.add('hidden');
+    if (files.length === 0) {
+        alert("Por favor, selecione uma imagem primeiro.");
+        return;
+    }
 
-    // Habilitar o input novamente
-    imageInput.disabled = false;
+    images = []; // Limpar imagens existentes
+
+    Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            standardSizes.forEach(size => {
+                let fileName;
+                if (renameInput.value) {
+                    fileName = `${renameInput.value}_${size.width}x${size.height}`;
+                } else if (useStandardNames.checked) {
+                    fileName = size.name;
+                } else {
+                    fileName = `${file.name.split('.')[0]}_${size.width}x${size.height}`;
+                }
+
+                images.push({
+                    name: fileName.split('.')[0],
+                    originalName: file.name,
+                    src: event.target.result,
+                    width: size.width,
+                    height: size.height,
+                    extension: fileFormatSelect.value === 'original' ? getFileExtension(file.name) : fileFormatSelect.value
+                });
+            });
+
+            updateImageList();
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
+// Alternar tema escuro/claro
+const themeToggle = document.getElementById('themeToggle');
+
+// Verificar preferência do sistema ou salva no localStorage
+if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+} else {
+    document.documentElement.classList.remove('dark');
 }
 
+// Alternar tema ao clicar no botão
+themeToggle.addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+    localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+});
